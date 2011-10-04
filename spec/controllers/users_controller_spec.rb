@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'faker'
 
 describe UsersController do
   render_views
@@ -53,7 +54,20 @@ describe UsersController do
         response.should have_selector("a", :href => "/users?page=2",
                                            :content => "Next")
       end
-      
+
+      it "should have delete link for own microposts" do
+        5.times do
+          mp = Factory(:micropost, :user => @user, :content => Faker::Lorem.sentence(5))
+        end
+        get :show, :id => @user
+        response.should have_selector("a", :content => "delete", :count => 5)
+      end
+
+      it "should not have delete link for other people's microposts" do
+        mp = Factory(:micropost, :user => @users[1], :content => Faker::Lorem.sentence(5))
+        get :show, :id => @users[1]
+        response.should_not have_selector("a", :content => "delete")
+      end
     end
   end
   
@@ -94,6 +108,19 @@ describe UsersController do
       get :show, :id => @user
       response.should have_selector("span.content", :content => mp1.content)
       response.should have_selector("span.content", :content => mp2.content)
+    end
+
+    it "should paginate microposts" do
+      60.times do
+        Factory(:micropost, :user => @user, :content => Faker::Lorem.sentence(5))
+      end
+      get :show, :id => @user
+      response.should have_selector("div.pagination")
+      response.should have_selector("span.disabled", :content => "Previous")
+      response.should have_selector("a", :href => "/users/1?page=2",
+                                         :content => "2")
+      response.should have_selector("a", :href => "/users/1?page=2",
+                                         :content => "Next")
     end
   end
   

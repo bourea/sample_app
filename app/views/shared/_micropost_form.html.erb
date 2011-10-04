@@ -1,10 +1,34 @@
+<script type="text/javascript">
+<!--
+    
+ $(function () {
+    $('textarea.limited').maxlength({
+        'feedback' : '.charsLeft' // note: looks within the current form
+    });
+     
+    $('input.limited').maxlength({
+        'feedback' : '.charsLeft' // note: looks within the current form
+    });
+      
+    $('textarea.wordLimited').maxlength({
+       'words': true,
+       'feedback': '.wordsLeft'
+    });
+ });
+    
+//-->
+</script>
+
 <%= form_for @micropost do |f| %>
   <%= render 'shared/error_messages', :object => f.object %>
   <div class="field">
-    <%= f.text_area :content %>
+    <p>Characters left: <span class="charsLeft">140</span></p>
+    <%= f.text_area :content, :class => "limited", :maxlength => 140 %>
+  </div>
+  <div class="fieldcount">
+    
   </div>
   <div class="actions">
     <%= f.submit "Submit" %>
   </div>
 <% end %>
-
